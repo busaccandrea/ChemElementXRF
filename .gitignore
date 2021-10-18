@@ -9,6 +9,7 @@ __pycache__/
 *.npy
 *.txt
 *.yaml
+*.pth
 
 # C extensions
 *.so
