@@ -1,0 +1,8 @@
+kernel_size: 5
+epochs: 25
+n_features: 64
+loss: MSELoss
+learning_rate: 0.0195
+output_path: './run/nelements_mse/'
+model_name: 'N_ElementCNN'
+batch_size: 512

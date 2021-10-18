@@ -1,0 +1,2 @@
+train_set: './data/DOggionoGiulia/train.h5'
+test_set: './data/DOggionoGiulia/test.h5'

@@ -1,0 +1,5 @@
+model: N_ElementCNN
+loss: MSELoss
+n_epochs: 25
+lr: 0.1
+batch_size: 512
