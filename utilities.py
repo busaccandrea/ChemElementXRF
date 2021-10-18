@@ -48,11 +48,11 @@ def create_h5_dataset(data_folder, train_test_ratio=0.8, seed=2233):
     # save h5 for train set
     print('Saving train.h5')
     with h5py.File(data_folder + 'train.h5','w') as f:
-        f.create_dataset('inputs', data = input_train)
-        f.create_dataset('targets', data = target_train)
+        f.create_dataset('data', data = input_train)
+        f.create_dataset('labels', data = target_train)
     
     # save h5 for test set
     print('Saving test.h5')
     with h5py.File(data_folder + 'test.h5','w') as f:
-        f.create_dataset('inputs', data = input_test)
-        f.create_dataset('targets', data = target_test)
+        f.create_dataset('data', data = input_test)
+        f.create_dataset('labels', data = target_test)
