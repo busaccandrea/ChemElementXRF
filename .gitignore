@@ -6,6 +6,9 @@ __pycache__/
 *.h5
 *.tif
 *.tiff
+*.npy
+*.txt
+*.yaml
 
 # C extensions
 *.so
