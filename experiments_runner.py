@@ -1,7 +1,6 @@
 import yaml
 from torch import optim
 from torch.nn import modules
-import yaml
 import torch
 from torchnet.logger import VisdomPlotLogger, VisdomSaver
 from torchnet.meter import AverageValueMeter
