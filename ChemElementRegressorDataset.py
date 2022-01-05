@@ -6,6 +6,7 @@ from time import time
 import numpy as np
 from torch.utils.data.sampler import Sampler
 import torchtest
+from sklearn.preprocessing import minmax_scale
 from matplotlib import pyplot as plt
 
 
@@ -23,7 +24,11 @@ class ChemElementRegressorDataset(Dataset):
     """ Build a custom dataset for ChemElementRegressor model """
     def __init__(self, data, labels, transform=ToTensor()):
         self.data = data
-        self.labels = np.array(labels)
+        self.labels = np.array(labels, dtype=float)
+        self.max_labels = np.max(self.labels, axis=0)
+        
+        # self.data = minmax_scale(self.data, axis=1)*2
+        # self.labels = minmax_scale(self.labels, axis=0)*2
 
         # print('\n\n\n', self.labels.shape,'\n\n')
 
@@ -70,13 +75,12 @@ class ChemElementRegressorDataset(Dataset):
         #         # choose randomly between self.low count indexes
         #         index = np.random.choice(self.low_count_idxs, 1)
 
-        val = self.labels[index]
-        value = val
+        counts = self.labels[index]
         
         row = self.data[index]
-        value = torch.tensor([value])
+        counts = torch.from_numpy(counts)
 
-        return {'row': row, 'counts': value}
+        return {'row': row, 'counts': counts}
 
                 
 class BalancedRandomSampler(Sampler):

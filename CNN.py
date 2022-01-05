@@ -1,6 +1,4 @@
-import torch
 import torch.nn as nn
-from torch.nn.modules.loss import MSELoss
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import DataLoader as DataLoader
 
@@ -94,15 +92,19 @@ class N_ElementCNN(nn.Module):
         self.conv_0 = nn.Conv1d(in_channels=1, out_channels=25, kernel_size=self.kernel_size, padding=int(kernel_size/2))
         self.maxpool_1 = nn.MaxPool1d(kernel_size=4, stride=4) #reducing factor: 4
         self.maxpool_2 = nn.MaxPool1d(kernel_size=2, stride=2) #reducing factor: 2
-        self.relu = nn.ReLU()
+        self.relu = nn.ELU()
+
         # second layer
         self.conv_1 = nn.Conv1d(in_channels=25, out_channels=12, kernel_size=self.kernel_size, padding=int(kernel_size/2))
+        
         # third layer
         self.conv_2 = nn.Conv1d(in_channels=12, out_channels=6, kernel_size=self.kernel_size, padding=int(kernel_size/2))
+        
         # fourth layer
         self.conv_3 = nn.Conv1d(in_channels=6, out_channels=1, kernel_size=self.kernel_size, padding=int(kernel_size/2))
+        
         # last layer
-        self.fc = nn.Linear(64, 4) # 2 elements
+        self.fc = nn.Linear(128, 10)
 
         self.feature_extractor = nn.Sequential(
             #first layer
@@ -134,16 +136,19 @@ class N_ElementCNN(nn.Module):
     
     def forward(self, data):
         output0 = self.conv_0(data)
-        output0 = self.maxpool_1(output0)
+        # output0 = self.maxpool_2(output0)
 
         output1 = self.conv_1(output0)
         output1 = self.maxpool_2(output1)
+        output1 = self.relu(output1)
 
         output2 = self.conv_2(output1)
         output2 = self.maxpool_2(output2)
+        output2 = self.relu(output2)
 
         output3 = self.conv_3(output2)
         output3 = self.maxpool_2(output3)
+        output3 = self.relu(output3)
 
         
         output = self.fc(output3)

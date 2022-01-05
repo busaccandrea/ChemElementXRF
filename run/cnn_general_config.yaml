@@ -1,0 +1,4 @@
+learning_rates: [0.0001, 0.00006, 0.00001]
+norm_data: [0]
+norm_labels: [0]
+preprocessing: ['none']
