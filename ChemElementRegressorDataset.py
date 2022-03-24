@@ -6,7 +6,7 @@ from time import time
 import numpy as np
 from torch.utils.data.sampler import Sampler
 import torchtest
-from sklearn.preprocessing import minmax_scale
+from sklearn.preprocessing import minmax_scale, PowerTransformer
 from matplotlib import pyplot as plt
 
 
@@ -22,35 +22,20 @@ class ToTensor(object):
 
 class ChemElementRegressorDataset(Dataset):
     """ Build a custom dataset for ChemElementRegressor model """
-    def __init__(self, data, labels, transform=ToTensor()):
-        self.data = data
+    def __init__(self, data, labels, preprocessing, normalize_data, normalize_labels):
+        self.data_set = data
         self.labels = np.array(labels, dtype=float)
         self.max_labels = np.max(self.labels, axis=0)
         
-        # self.data = minmax_scale(self.data, axis=1)*2
-        # self.labels = minmax_scale(self.labels, axis=0)*2
+        self.data_set[self.data_set<0] = 0
+        self.labels[self.labels<0] = 0
 
-        # print('\n\n\n', self.labels.shape,'\n\n')
-
-        # x, _, _ = plt.hist(self.labels.reshape(
-        #     (self.labels.shape[0]*self.labels.shape[1], self.labels.shape[2])), bins=2000)
-        # # show histogram of labels
-        # # plt.gca().set(title='Frequency Histogram', ylabel='Frequency')
-        # # plt.show()
-
-        # self.threshold = np.argmax(x)
-        # print('Threshold high/low counts:', np.max(x), self.threshold, self.threshold * 0.6)
-
-        # self.high_count_idxs = np.where(self.labels>self.threshold)[0] # where label is > threshold
-        # self.low_count_idxs = np.where(self.labels<=self.threshold)[0] # where label is <= threshold
-        # print('ratio beetween high and low counts:', len(self.high_count_idxs),'/', len(self.low_count_idxs))
-
-        # self.trasform = transform
-        # self.pick_high = True
+        self.normalization(normalize_data, normalize_labels)
+        self.preprocessing(preprocessing)
 
  
     def __len__(self):
-        return self.data.shape[0]
+        return self.data_set.shape[0]
 
 
     def __getitem__(self, index):
@@ -58,29 +43,31 @@ class ChemElementRegressorDataset(Dataset):
             index = index.tolist()
         else:
             index = [index]
-        
-        # val = self.labels[index]
-        # value = int(val)
-
-        # if self.pick_high:
-        #     if value >= self.threshold:
-        #         self.pick_high = False
-        #     else:
-        #         # choose randomly between self.high count indexes
-        #         index = np.random.choice(self.high_count_idxs, 1)
-        # else:
-        #     if value < self.threshold:
-        #         self.pick_high = True
-        #     else:
-        #         # choose randomly between self.low count indexes
-        #         index = np.random.choice(self.low_count_idxs, 1)
 
         counts = self.labels[index]
         
-        row = self.data[index]
+        row = self.data_set[index]
         counts = torch.from_numpy(counts)
 
         return {'row': row, 'counts': counts}
+
+    def preprocessing(self, p):
+        if p=='log':
+            self.data_set[self.data_set<1] = 1
+            self.data_set = np.log(self.data_set)
+        elif p=='sqrt':
+            self.data_set[self.data_set<0] = 0
+            self.data_set = np.sqrt(self.data_set)
+        elif p=='exp':
+            self.data_set = np.exp(self.data_set)
+        elif not p=='none':
+            print('Invalid preprocessing option')
+
+    def normalization(self, norm_data, norm_labels):
+        if norm_data == 1:
+            self.data_set = minmax_scale(self.data_set, axis=1)
+        if norm_labels == 1:
+            self.labels = minmax_scale(self.labels, axis=0)
 
                 
 class BalancedRandomSampler(Sampler):
